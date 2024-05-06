@@ -1,0 +1,915 @@
+//sap 7
+
+
+/*
+Aplicația 7.1: Să se scrie o funcție care primește două liste și returnează 1 dacă ele sunt identice, altfel 0.
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+// un element al listei
+typedef struct elem
+{
+    int n; // informatia utila
+    struct elem *urm; // camp de inlantuire catre urmatorul element
+}elem;
+
+// aloca un nou element si ii seteaza campurile corespunzatoare
+
+elem *nou(int n,elem *urm)
+{
+    elem *e=(elem*)malloc(sizeof(elem));
+    if(!e)
+    {
+        printf("memorie insuficienta");
+        exit(EXIT_FAILURE);
+    }
+    e->n=n;
+    e->urm=urm;
+    return e;
+}
+
+// adauga un element la inceputul listei
+// returneaza noua lista
+
+elem *adaugaInceput(elem *lista,int n)
+{
+    return nou(n,lista);
+}
+
+// adauga un element la sfarsitul listei
+// returneaza noua lista
+
+elem *adaugaSfarsit(elem *lista,int n)
+{
+    if(!lista)
+        return nou(n,NULL);
+    elem *p=lista,*urm;
+    for(urm=p->urm;urm;p=urm,urm=p->urm)
+    {
+
+    }
+    p->urm=nou(n,NULL);
+    return lista;
+}
+
+void afisare(elem *lista)
+{
+    for(;lista;lista=lista->urm)
+    {
+        printf("%d ",lista->n);
+    }
+    putchar('\n');
+}
+
+// elibereaza memoria ocupata de o lista
+void eliberare(elem *lista)
+{
+    elem *p;
+    while(lista)
+    {
+        p=lista->urm;
+        free(lista);
+        lista=p;
+    }
+}
+// se presupune ca sunt sortate crescator
+int verificare(elem *l1, elem *l2)
+{
+    int ok=1;
+    elem *p=l1;
+    elem *p2=l2;
+    while(p)
+    {
+        if(p->n != p2->n)
+            return 0;
+        p=p->urm;
+        p2=p2->urm;
+
+    }
+    return 1;
+}
+
+elem *adauga_dupa_poz_k(elem *lista, int n, int k)
+{
+    // Verificăm dacă lista este goală
+    if (lista == NULL) {
+        // Lista este goală, deci putem adăuga elementul ca primul element
+        return nou(n, NULL);
+    }
+
+    // Numărăm pozițiile din lista
+    int lungime = 0;
+    elem *p = lista;
+    while (p != NULL) {
+        lungime++;
+        p = p->urm;
+    }
+
+    // Verificăm dacă k depășește lungimea listei
+    if (k >= lungime) {
+        // Adăugăm elementul la finalul listei
+        elem *ultimul = lista;
+        while (ultimul->urm != NULL) {
+            ultimul = ultimul->urm;
+        }
+        ultimul->urm = nou(n, NULL);
+        return lista;
+    }
+
+    // Parcurgem lista pentru a ajunge la poziția k
+    p = lista;
+    for (int i = 0; i < k; i++) {
+        p = p->urm;
+    }
+
+    // Cream noul element
+    elem *aux = nou(n, p->urm);
+    // Actualizăm legăturile în listă
+    p->urm = aux;
+
+    return lista;
+}
+
+int main()
+{
+    // varianta 1: construieste direct lista dorita
+    elem *lista1=nou(108,nou(-1,nou(49,NULL)));
+    afisare(lista1);
+
+    elem *lista2=nou(108,nou(-1,nou(49,NULL)));
+    afisare(lista1);
+
+    printf("%d",verificare(lista1,lista2));
+
+    eliberare(lista1);
+    eliberare(lista2);
+
+    // varianta 2: adauga la inceputul listei elementele in ordinea inversa
+    elem *lista2=NULL;
+    lista2=adaugaInceput(lista2,49);
+    lista2=adaugaInceput(lista2,-1);
+    lista2=adaugaInceput(lista2,108);
+    afisare(lista2);
+    eliberare(lista2);
+
+    // varianta 3: adauga la sfarsitul listei
+    elem *lista3=NULL;
+    lista3=adaugaSfarsit(lista3,108);
+    lista3=adaugaSfarsit(lista3,-1);
+    lista3=adaugaSfarsit(lista3,49);
+    afisare(lista3);
+    eliberare(lista3);
+    return 0;
+}
+
+
+/*
+Aplicația 7.3: Să se scrie o funcție care primește ca parametri două liste și returnează o listă care reprezintă
+reuniunea elementelor lor, fiecare element apărând o singură dată, chiar dacă în listele originare el este duplicat.
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+// un element al listei
+typedef struct elem
+{
+    int n; // informatia utila
+    struct elem *urm; // camp de inlantuire catre urmatorul element
+}elem;
+
+// aloca un nou element si ii seteaza campurile corespunzatoare
+
+elem *nou(int n,elem *urm)
+{
+    elem *e=(elem*)malloc(sizeof(elem));
+    if(!e)
+    {
+        printf("memorie insuficienta");
+        exit(EXIT_FAILURE);
+    }
+    e->n=n;
+    e->urm=urm;
+    return e;
+}
+
+elem *adaugaSfarsit(elem *lista,int n)
+{
+    if(!lista)
+        return nou(n,NULL);
+    elem *p=lista,*urm;
+    for(urm=p->urm;urm;p=urm,urm=p->urm)
+    {
+
+    }
+    p->urm=nou(n,NULL);
+    return lista;
+}
+
+void afisare(elem *lista)
+{
+    for(;lista;lista=lista->urm)
+    {
+        printf("%d ",lista->n);
+    }
+    putchar('\n');
+}
+
+// elibereaza memoria ocupata de o lista
+void eliberare(elem *lista)
+{
+    elem *p;
+    while(lista)
+    {
+        p=lista->urm;
+        free(lista);
+        lista=p;
+    }
+}
+
+int exista(elem *lista,int n)
+{
+    if(lista==NULL)
+        return 0;
+    int ok=0;
+    elem *p=lista;
+    while(p)
+    {
+        if(p->n==n)
+           return 1;
+        p=p->urm;
+    }
+
+    return 0;
+}
+
+elem *reuniune(elem *lista1,elem *lista2)
+{
+    elem *lista3=NULL;
+
+
+
+    elem *p=lista1;
+    while (p)
+    {
+        if(exista(lista3,p->n)==0)
+        {
+            lista3=adaugaSfarsit(lista3,p->n);
+        }
+        p=p->urm;
+    }
+
+    elem *pp=lista2;
+    while (pp)
+    {
+        if(exista(lista3,pp->n)==0)
+        {
+            lista3=adaugaSfarsit(lista3,pp->n);
+        }
+        pp=pp->urm;
+    }
+
+    return lista3;
+}
+
+
+int main()
+{
+    
+
+   
+
+    // varianta 3: adauga la sfarsitul listei
+    elem *lista1=NULL;
+    lista1=adaugaSfarsit(lista1,108);
+    lista1=adaugaSfarsit(lista1,-1);
+    lista1=adaugaSfarsit(lista1,49);
+    lista1=adaugaSfarsit(lista1,5);
+    afisare(lista1);
+    lista1=adauga_dupa_poz_k(lista1,7,5);
+    afisare(lista1);
+
+    elem *lista3=NULL;
+    lista3=adaugaSfarsit(lista3,1);
+    lista3=adaugaSfarsit(lista3,2);
+    lista3=adaugaSfarsit(lista3,3);
+    lista3=adaugaSfarsit(lista3,7);
+    afisare(lista3);
+
+
+    elem *lista=reuniune(lista1,lista3);
+    afisare(lista);
+
+    eliberare(lista3);
+    eliberare(lista1);
+   eliberare(lista);
+
+   printf("ok \n");
+
+    return 0;
+}
+
+
+/*
+Aplicația 7.4: Pentru implementarea listei care memorează adresa ultimului element, să se scrie o funcție șterge,
+care șterge din listă un element dat.
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+// un element al listei
+typedef struct elem
+{
+    int n; // informatia utila
+    struct elem *urm; // camp de inlantuire catre urmatorul element
+}elem;
+
+// aloca un nou element si ii seteaza campurile corespunzatoare
+
+elem *nou(int n,elem *urm)
+{
+    elem *e=(elem*)malloc(sizeof(elem));
+    if(!e)
+    {
+        printf("memorie insuficienta");
+        exit(EXIT_FAILURE);
+    }
+    e->n=n;
+    e->urm=urm;
+    return e;
+}
+
+elem *adaugaSfarsit(elem *lista,int n)
+{
+    if(!lista)
+        return nou(n,NULL);
+    elem *p=lista,*urm;
+    for(urm=p->urm;urm;p=urm,urm=p->urm)
+    {
+
+    }
+    p->urm=nou(n,NULL);
+    return lista;
+}
+
+void afisare(elem *lista)
+{
+    for(;lista;lista=lista->urm)
+    {
+        printf("%d ",lista->n);
+    }
+    putchar('\n');
+}
+
+// elibereaza memoria ocupata de o lista
+void eliberare(elem *lista)
+{
+    elem *p;
+    while(lista)
+    {
+        p=lista->urm;
+        free(lista);
+        lista=p;
+    }
+}
+
+
+void sterge_element_n(elem *lista, int n) {
+    elem *p = lista;
+    elem *prev = NULL;
+
+    // Cautăm elementul în listă și ținem evidența elementului anterior
+    while (p)
+    {
+        if (p->n == n) 
+        {
+            // Dacă elementul este primul din listă, actualizăm capul listei
+            if (prev == NULL) 
+            {
+                lista = p->urm;
+            } 
+            else 
+            {
+                // Altfel, actualizăm legătura anteriorului cu următorul element
+                prev->urm = p->urm;
+            }
+            free(p); // Eliberăm memoria ocupată de elementul șters
+            return;
+        }
+        prev = p;
+        p = p->urm;
+    }
+}
+
+
+
+
+
+int main()
+{
+    
+    // varianta 3: adauga la sfarsitul listei
+    elem *lista1=NULL;
+    lista1=adaugaSfarsit(lista1,108);
+    lista1=adaugaSfarsit(lista1,-1);
+    lista1=adaugaSfarsit(lista1,49);
+    lista1=adaugaSfarsit(lista1,5);
+    afisare(lista1);
+    afisare(lista1);
+    printf("ok \n");
+    afisare(lista1);
+    sterge_element_n(lista1,-1);
+    sterge_element_n(lista1,5);
+    afisare(lista1);
+    printf("ok \n");
+
+    elem *lista3=NULL;
+    lista3=adaugaSfarsit(lista3,1);
+    lista3=adaugaSfarsit(lista3,2);
+    lista3=adaugaSfarsit(lista3,3);
+    lista3=adaugaSfarsit(lista3,7);
+    afisare(lista3);
+
+
+    
+
+    eliberare(lista3);
+    eliberare(lista1);
+  
+
+   printf("ok \n");
+
+    return 0;
+}
+
+
+/*
+Să se scrie o funcție care primește două liste și returnează 1 dacă ele sunt egale, indiferent de
+ordinea și numărul elementelor, altfel returnează 0.
+Exemple: listele {1, 7, 3, 1, 3} și {7, 1, 3, 7} sunt egale. Listele {1,2} și {2} nu sunt egale.
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+// un element al listei
+typedef struct elem
+{
+    int n; // informatia utila
+    struct elem *urm; // camp de inlantuire catre urmatorul element
+}elem;
+
+// aloca un nou element si ii seteaza campurile corespunzatoare
+
+elem *nou(int n,elem *urm)
+{
+    elem *e=(elem*)malloc(sizeof(elem));
+    if(!e)
+    {
+        printf("memorie insuficienta");
+        exit(EXIT_FAILURE);
+    }
+    e->n=n;
+    e->urm=urm;
+    return e;
+}
+
+// adauga un element la inceputul listei
+// returneaza noua lista
+
+elem *adaugaInceput(elem *lista,int n)
+{
+    return nou(n,lista);
+}
+
+// adauga un element la sfarsitul listei
+// returneaza noua lista
+
+elem *adaugaSfarsit(elem *lista,int n)
+{
+    if(!lista)
+        return nou(n,NULL);
+    elem *p=lista,*urm;
+    for(urm=p->urm;urm;p=urm,urm=p->urm)
+    {
+
+    }
+    p->urm=nou(n,NULL);
+    return lista;
+}
+
+void afisare(elem *lista)
+{
+    for(;lista;lista=lista->urm)
+    {
+        printf("%d ",lista->n);
+    }
+    putchar('\n');
+}
+
+// elibereaza memoria ocupata de o lista
+void eliberare(elem *lista)
+{
+    elem *p;
+    while(lista)
+    {
+        p=lista->urm;
+        free(lista);
+        lista=p;
+    }
+}
+
+
+int verificare(elem *l1, elem *l2)
+{
+    int ok=1;
+    elem *i=l1;
+    elem *j=l2;
+    for(;i;i=i->urm)
+    {
+        ok=0;
+        j=l2;
+        for (;j;j=j->urm)
+        {
+            if(i->n == j->n)
+                ok++;
+            
+        }
+        if(ok==0)
+            return 0;
+        
+    }
+    return 1;
+    
+}
+
+elem *adauga_dupa_poz_k(elem *lista, int n, int k)
+{
+    // Verificăm dacă lista este goală
+    if (lista == NULL) {
+        // Lista este goală, deci putem adăuga elementul ca primul element
+        return nou(n, NULL);
+    }
+
+    // Numărăm pozițiile din lista
+    int lungime = 0;
+    elem *p = lista;
+    while (p != NULL) {
+        lungime++;
+        p = p->urm;
+    }
+
+    // Verificăm dacă k depășește lungimea listei
+    if (k >= lungime) {
+        // Adăugăm elementul la finalul listei
+        elem *ultimul = lista;
+        while (ultimul->urm != NULL) {
+            ultimul = ultimul->urm;
+        }
+        ultimul->urm = nou(n, NULL);
+        return lista;
+    }
+
+    // Parcurgem lista pentru a ajunge la poziția k
+    p = lista;
+    for (int i = 0; i < k; i++) {
+        p = p->urm;
+    }
+
+    // Cream noul element
+    elem *aux = nou(n, p->urm);
+    // Actualizăm legăturile în listă
+    p->urm = aux;
+
+    return lista;
+}
+
+int main()
+{
+    // varianta 3: adauga la sfarsitul listei
+    elem *lista3=NULL;
+    lista3=adaugaSfarsit(lista3,1);
+    lista3=adaugaSfarsit(lista3,7);
+    lista3=adaugaSfarsit(lista3,3);
+    lista3=adaugaSfarsit(lista3,1);
+    lista3=adaugaSfarsit(lista3,3);
+    afisare(lista3);
+
+    elem *lista1=NULL;
+    lista1=adaugaSfarsit(lista1,7);
+    lista1=adaugaSfarsit(lista1,1);
+    lista1=adaugaSfarsit(lista1,2);
+    lista1=adaugaSfarsit(lista1,7);
+    afisare(lista1);
+
+    printf("%d\n",verificare(lista1,lista3));
+
+    
+    eliberare(lista3);
+    eliberare(lista1);
+    return 0;
+}
+
+
+/*
+Aplicația 7.1: Să se scrie o funcție care primește două liste și returnează 1 dacă ele sunt identice, altfel 0.
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+// un element al listei
+typedef struct elem
+{
+    int n; // informatia utila
+    struct elem *urm; // camp de inlantuire catre urmatorul element
+}elem;
+
+// aloca un nou element si ii seteaza campurile corespunzatoare
+
+elem *nou(int n,elem *urm)
+{
+    elem *e=(elem*)malloc(sizeof(elem));
+    if(!e)
+    {
+        printf("memorie insuficienta");
+        exit(EXIT_FAILURE);
+    }
+    e->n=n;
+    e->urm=urm;
+    return e;
+}
+
+// adauga un element la inceputul listei
+// returneaza noua lista
+
+elem *adaugaInceput(elem *lista,int n)
+{
+    return nou(n,lista);
+}
+
+// adauga un element la sfarsitul listei
+// returneaza noua lista
+
+elem *adaugaSfarsit(elem *lista,int n)
+{
+    if(!lista)
+        return nou(n,NULL);
+    elem *p=lista,*urm;
+    for(urm=p->urm;urm;p=urm,urm=p->urm)
+    {
+
+    }
+    p->urm=nou(n,NULL);
+    return lista;
+}
+
+void afisare(elem *lista)
+{
+    for(;lista;lista=lista->urm)
+    {
+        printf("%d ",lista->n);
+    }
+    putchar('\n');
+}
+
+// elibereaza memoria ocupata de o lista
+void eliberare(elem *lista)
+{
+    elem *p;
+    while(lista)
+    {
+        p=lista->urm;
+        free(lista);
+        lista=p;
+    }
+}
+// se presupune ca sunt sortate crescator
+int verificare(elem *l1, elem *l2)
+{
+    int ok=1;
+    elem *p=l1;
+    elem *p2=l2;
+    while(p)
+    {
+        if(p->n != p2->n)
+            return 0;
+        p=p->urm;
+        p2=p2->urm;
+
+    }
+    return 1;
+}
+
+elem *adauga_dupa_crescator(elem *lista, int n) {
+    // Verificăm dacă lista este goală
+    if (lista == NULL) {
+        // Lista este goală, deci putem adăuga elementul ca primul element
+        return nou(n, NULL);
+    }
+
+    elem *p = lista;
+    elem *prev = NULL;
+
+    while (p) {
+        if (p->n > n) {
+            // Am găsit locul potrivit pentru a adăuga elementul
+            elem *aux = nou(n, p);
+            if (prev == NULL) {
+                // Elementul trebuie adăugat la începutul listei
+                return aux;
+            } else {
+                // Elementul trebuie adăugat în mijlocul listei
+                prev->urm = aux;
+                return lista;
+            }
+        }
+        prev = p;
+        p = p->urm;
+    }
+
+    // Elementul trebuie adăugat la sfârșitul listei
+    prev->urm = nou(n, NULL);
+    return lista;
+}
+
+
+int main()
+{
+    
+
+    // varianta 3: adauga la sfarsitul listei
+    elem *lista3=NULL;
+    lista3=adaugaSfarsit(lista3,4);
+    lista3=adaugaSfarsit(lista3,6);
+    lista3=adaugaSfarsit(lista3,7);
+    lista3=adauga_dupa_crescator(lista3,5);
+    afisare(lista3);
+    eliberare(lista3);
+    return 0;
+}
+
+
+/*
+Aplicația 7.1: Să se scrie o funcție care primește două liste și returnează 1 dacă ele sunt identice, altfel 0.
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+// un element al listei
+typedef struct elem
+{
+    int n; // informatia utila
+    struct elem *urm; // camp de inlantuire catre urmatorul element
+}elem;
+
+// aloca un nou element si ii seteaza campurile corespunzatoare
+
+elem *nou(int n,elem *urm)
+{
+    elem *e=(elem*)malloc(sizeof(elem));
+    if(!e)
+    {
+        printf("memorie insuficienta");
+        exit(EXIT_FAILURE);
+    }
+    e->n=n;
+    e->urm=urm;
+    return e;
+}
+
+// adauga un element la inceputul listei
+// returneaza noua lista
+
+elem *adaugaInceput(elem *lista,int n)
+{
+    return nou(n,lista);
+}
+
+// adauga un element la sfarsitul listei
+// returneaza noua lista
+
+elem *adaugaSfarsit(elem *lista,int n)
+{
+    if(!lista)
+        return nou(n,NULL);
+    elem *p=lista,*urm;
+    for(urm=p->urm;urm;p=urm,urm=p->urm)
+    {
+
+    }
+    p->urm=nou(n,NULL);
+    return lista;
+}
+
+void afisare(elem *lista)
+{
+    for(;lista;lista=lista->urm)
+    {
+        printf("%d ",lista->n);
+    }
+    putchar('\n');
+}
+
+// elibereaza memoria ocupata de o lista
+void eliberare(elem *lista)
+{
+    elem *p;
+    while(lista)
+    {
+        p=lista->urm;
+        free(lista);
+        lista=p;
+    }
+}
+// se presupune ca sunt sortate crescator
+int verificare(elem *l1, elem *l2)
+{
+    int ok=1;
+    elem *p=l1;
+    elem *p2=l2;
+    while(p)
+    {
+        if(p->n != p2->n)
+            return 0;
+        p=p->urm;
+        p2=p2->urm;
+
+    }
+    return 1;
+}
+
+elem *adauga_dupa_crescator(elem *lista, int n)
+ {
+    // Verificăm dacă lista este goală
+    if (lista == NULL) {
+        // Lista este goală, deci putem adăuga elementul ca primul element
+        return nou(n, NULL);
+    }
+
+    elem *p = lista;
+    elem *prev = NULL;
+
+    while (p) {
+        if (p->n > n) {
+            // Am găsit locul potrivit pentru a adăuga elementul
+            elem *aux = nou(n, p);
+            if (prev == NULL) {
+                // Elementul trebuie adăugat la începutul listei
+                return aux;
+            } else {
+                // Elementul trebuie adăugat în mijlocul listei
+                prev->urm = aux;
+                return lista;
+            }
+        }
+        prev = p;
+        p = p->urm;
+    }
+
+    // Elementul trebuie adăugat la sfârșitul listei
+    prev->urm = nou(n, NULL);
+    return lista;
+}
+
+elem *functie(elem *lista1,elem * lista2)
+{
+    elem *lista=lista1;
+    elem *p=lista2;
+    while(p)
+    {
+        lista=adauga_dupa_crescator(lista,p->n);
+        p=p->urm;
+    }
+    return lista;
+}
+
+
+int main()
+{
+    
+
+    // varianta 3: adauga la sfarsitul listei
+    elem *lista3=NULL;
+    lista3=adaugaSfarsit(lista3,1);
+    lista3=adaugaSfarsit(lista3,2);
+    lista3=adaugaSfarsit(lista3,7);
+    lista3=adauga_dupa_crescator(lista3,8);
+    afisare(lista3);
+
+    elem *lista=NULL;
+    lista=adaugaSfarsit(lista,2);
+    lista=adaugaSfarsit(lista,9);
+    
+    afisare(lista);
+
+    elem *lista1=functie(lista3,lista);
+    afisare(lista1);
+
+
+
+
+
+    eliberare(lista3);
+
+
+    return 0;
+}
