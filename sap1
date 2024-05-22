@@ -1,0 +1,690 @@
+//1 si 2
+#include <stdio.h>
+int main(void)
+{
+  int n,m,aux;
+  int i,j;
+  
+  scanf("%d",&m);
+  scanf("%d",&n);
+
+  int a[m][n];
+
+  /*
+  pb 1
+
+  Aplicația 8.3: Se citește de la tastatură un număr n<=10 și un număr m<=20. Se cere să se scrie un program care
+  generează o matrice cu m linii și n coloane în care sunt puse toate numerele de la 1,2,3,...,m*n. Se vor utiliza
+  pointeri.
+  */
+  int cnt=1;
+
+  for(i=0;i<m;i++)
+    for(j=0;j<n;j++)
+      {
+	        a[i][j]=cnt;
+	        cnt++;
+      }//
+
+  for(i=0;i<m;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+	        printf("%d ",a[i][j]);
+      }
+      printf("\n");
+    }
+
+  printf("\n");
+
+  /*
+  pb2
+
+  Aplicația 8.4: Se citește de la tastatură o matrice pătratică cu n<=50 linii și coloane. Să se interschimbe elementele
+  de deasupra diagonalei principale, considerată ca axă de simetrie, cu elementele de sub diagonala principală,
+  elementele de pe diagonala principală rămânând la fel. 
+  
+  */
+
+  for(i=0;i<m;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+	        if(i<j)
+	        {
+	            aux=a[i][j];
+	            a[i][j]=a[j][i];
+	            a[j][i]=aux;
+	        }
+	        //printf("%d ",a[i][j]);
+      }
+      //printf("\n");
+    }
+
+
+  for(i=0;i<m;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+	        printf("%d ",a[i][j]);
+      }
+      printf("\n");
+    }
+
+  
+
+  
+  
+  return 0;
+}
+
+//3
+#include <stdio.h>
+int main(void)
+{
+    FILE *fin;
+    fin=fopen("date.txt","r");
+
+    int n,i,j;
+    fscanf(fin,"%d",&n);
+    int a[n][n];
+
+    for(i=0;i<n;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+        fscanf(fin,"%d",&a[i][j]);
+      }
+    }
+
+    int lin[n];
+    int col[n];
+
+    //suma lini
+
+    for(i=0;i<n;i++)
+    {
+        lin[i]=0;
+      for(j=0;j<n;j++)
+      {
+        lin[i]=lin[i]+a[i][j];
+      }
+
+      printf("linia i %d are suma %d\n",i+1,lin[i]);
+
+    }
+
+    //suma col
+
+    for(j=0;j<n;j++)
+    {
+        col[j]=0;
+      for(i=0;i<n;i++)
+      {
+        col[j]=col[j]+a[i][j];
+      }
+
+      printf("linia j %d are suma %d\n",j+1,col[j]);
+      
+    }
+    printf("\n");
+
+
+
+    for(i=0;i<n;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+	        printf("%d ",a[i][j]);
+      }
+      printf("\n");
+    }
+    fclose(fin);
+    return 0;
+}
+//4
+/*
+Se citește un număr n<=10 de persoane, fiecare persoană fiind identificată printr-un număr între
+0..n-1. O persoană poate fi prietenă cu oricare alte persoane. După ce s-a citit n, se vor citi pentru fiecare persoană
+prietenii ei pe rând. Să se afișeze pentru fiecare persoană câți prieteni are.
+*/
+
+#include <stdio.h>
+
+int main(void)
+{
+    FILE *fin;
+    fin=fopen("date.txt","r");
+
+    int n,i,j,m,x,y,d,p,s,jj,ok,nr;
+
+    // n 
+     
+    fscanf(fin,"%d",&n);
+   
+
+
+    int a[n][n];
+    
+    for(i=0;i<n;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+       a[i][j]==0;//initial nimeni nu are nici un prieten
+      }
+    }
+
+    //mat a
+
+    for(i=0;i<n;i++)
+    {
+      fscanf(fin,"%d",&nr);//nr de prieteni
+      for(j=0;j<nr;j++)
+      {
+
+        fscanf(fin,"%d",&x);//prietenul
+        a[i][x]=1;
+      }
+    }
+
+    for(i=0;i<n;i++)
+    {
+      printf("persoana i %d are prietenii:",i);
+      for(j=0;j<n;j++)
+      {
+        if(a[i][j]==1)
+          printf("%d ",j);
+      }
+      printf("\n");
+    }
+
+
+
+    
+
+    fclose(fin);
+    return 0;
+}
+//5
+//pb orase
+#include <stdio.h>
+int main(void)
+{
+    FILE *fin;
+    fin=fopen("date.txt","r");
+
+    int n,i,j,m,x,y,d;
+    //citeste nr orase
+    fscanf(fin,"%d",&n);
+
+    int a[n][n];
+
+    for(i=0;i<n;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+        a[i][j]=0;
+      }
+    }
+
+    //citeste nr perechi(pt simplitate)
+    fscanf(fin,"%d",&m);
+
+    for(i=0;i<m;i++)
+    {
+        //oras 1
+        fscanf(fin,"%d",&x);
+        //oras 2
+        fscanf(fin,"%d",&y);
+        //distanta
+        fscanf(fin,"%d",&d);
+
+        //se incepe de la orasul 0
+        a[x][y]=d;
+        a[y][x]=d;
+    }
+
+    int dmin=999;
+    int imin,jmin;
+
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n;j++)
+        {
+            if(a[i][j]<dmin && a[i][j]!=0)
+            {
+                dmin=a[i][j];
+                imin=i;
+                jmin=j;
+
+            }
+
+
+        }
+    }
+
+    printf("dis minima %d si perechea de orase este %d si %d\n",dmin,imin,jmin);
+
+
+
+    for(i=0;i<n;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+	        printf("%d ",a[i][j]);
+      }
+      printf("\n");
+    }
+
+    fclose(fin);
+    return 0;
+}
+//6
+/*
+: Se citesc numerele m,n,p fiecare mai mici decat 10, apoi se citesc matricile a[m][n] și b[n][p]. Se
+cere să se calculeze matricea „c” care rezultă din înmulțirea matricilor a cu b și să se afișeze.
+
+ex 3 2 3
+
+1 2
+3 4
+2 3
+
+2 2 3
+5 5 6
+
+output
+12 12 15
+26 26 33
+19 19 24
+*/
+#include <stdio.h>
+
+int main(void)
+{
+    FILE *fin;
+    fin=fopen("date.txt","r");
+
+    int n,i,j,m,x,y,d,p,s,jj;
+    //m n p
+    fscanf(fin,"%d",&m);
+    fscanf(fin,"%d",&n);
+    fscanf(fin,"%d",&p);
+
+
+    int a[m][n];
+    int b[n][p];
+    int c[m][p];
+
+    //mat a
+
+    for(i=0;i<m;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+        fscanf(fin,"%d",&a[i][j]);
+      }
+    }
+
+    // mat b
+    for(i=0;i<n;i++)
+    {
+      for(j=0;j<p;j++)
+      {
+        fscanf(fin,"%d",&b[i][j]);
+      }
+    }
+
+
+    for(i=0;i<m;i++)
+    {
+        for(j=0;j<p;j++)
+        {
+            s=0;
+            // lin i din a si col j din b
+            for(jj=0;jj<n;jj++)
+            {
+                s=s+a[i][jj]*b[jj][j];
+            }
+            printf("%d ",s);
+            c[i][j]=s;
+        }
+        printf("\n");
+    }
+
+    fclose(fin);
+    return 0;
+}
+//7
+/*
+1 diag principala
+*/
+#include <stdio.h>
+
+int main(void)
+{
+    FILE *fin;
+    fin=fopen("date.txt","r");
+
+    int n,i,j,m,x,y,d,p,s,jj;
+    // n 
+     
+    fscanf(fin,"%d",&n);
+   
+
+
+    int a[n][n];
+    
+
+    //mat a
+
+    for(i=0;i<n;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+        if(i==j)
+            a[i][j]=1;
+        else
+            a[i][j]=0;
+      }
+    }
+
+
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n;j++)
+        {
+            printf("%d ",a[i][j]);
+        }
+        printf("\n");
+    }
+
+    fclose(fin);
+    return 0;
+}
+//
+/*
+Se citește un număr n<=10 de produse și pentru fiecare produs vânzările lui trimestriale pe un an
+(4 valori). Se cere să se afișeze care produse au înregistrat o creștere continuă a vânzărilor în decurs de un an.
+*/
+#include <stdio.h>
+
+int main(void)
+{
+    FILE *fin;
+    fin=fopen("date.txt","r");
+
+    int n,i,j,m,x,y,d,p,s,jj,ok;
+    // n 
+     
+    fscanf(fin,"%d",&n);
+   
+
+
+    int a[n][4];
+    
+
+    //mat a
+
+    for(i=0;i<n;i++)
+    {
+      for(j=0;j<4;j++)
+      {
+        fscanf(fin,"%d",&a[i][j]);
+      }
+    }
+
+
+    for(i=0;i<n;i++)
+    {
+        ok=0;
+        for(j=1;j<4;j++)
+        {
+           if(a[i][j-1]>=a[i][j])
+                ok++;
+        }
+        if(ok==0)
+            printf("crestere continu are produsul i %d\n",i);
+    }
+
+    fclose(fin);
+    return 0;
+}
+
+//tema proiect ex de examen
+//1
+#include <stdio.h>
+int main(void)
+{
+  int n,m,aux;
+  int i,j,ii,jj,ok;
+  
+  scanf("%d",&n);
+  scanf("%d",&m);
+
+  int a[n][n];
+  int b[m][m];
+  int cnt=1;
+
+  for(i=0;i<n;i++)
+    for(j=0;j<n;j++)
+      {
+        scanf("%d",&a[i][j]);
+      }
+
+
+    for(i=0;i<m;i++)
+        for(j=0;j<m;j++)
+        {
+            scanf("%d",&b[i][j]);
+        }
+
+
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n;j++)
+        {
+            if(i+1<=m && j+m-1<n)
+            {
+                ok=1;
+                for(ii=0;ii<m && ok==1;ii++)
+                {
+                    for(jj=0;jj<m && ok==1;jj++)
+                    {
+                        if(b[ii][jj]!=a[i+ii][j+jj])
+                        {
+                            ok=0;
+                        }
+                    }
+                }
+                if(ok==1)
+                {
+                    printf("(%d,%d)\n",i,j);
+                }
+            }
+        }
+    }
+
+  for(i=0;i<n;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+	        printf("%d ",a[i][j]);
+      }
+      printf("\n");
+    }
+
+  printf("\n");
+
+  
+
+
+  for(i=0;i<m;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+	        printf("%d ",b[i][j]);
+      }
+      printf("\n");
+    }
+
+  
+  
+  return 0;
+}
+
+//2
+//am inversat vestul cu estul ( vest e dreapta la mine)
+/*
+Subiect 8.2: Se citesc de la tastatură un număr n și o matrice pătratică de dimensiune n conținând litere din
+alfabet. Pe urmă se citește de la tastatură un cuvânt. Verificați dacă respectivul cuvânt se poate construi
+parcurgând literele matricii pe verticală în sus sau în jos sau pe orizontală spre stânga sau spre dreapta. Afișați
+toate pozițiile de unde trebuie începută parcurgerea, precum și sensul de parcurgere necesar pentru a construi
+cuvântul.
+Spre exemplu, dacă de la tastatură se introduce:
+5
+e r e m a
+h e r e b
+b m e r e
+b a m e r
+a e m r e
+mere
+pe ecran se va afișa:
+De la linia 0 coloana 3 spre stânga.
+De la linia 0 coloana 3 în jos.
+De la linia 2 coloana 1 spre dreapta.
+De la linia 3 coloana 2 în sus.
+Nu are importanță ordinea în care sunt afișate soluțiile găsite. Dacă nu există soluție, se afișează “Nu există
+soluție”.
+*/
+#include <stdio.h>
+#include <string.h>
+int main(void)
+{
+
+  FILE *fin;
+  fin=fopen("date.txt","r");
+
+  int n,m,aux;
+  int i,j,ii,jj,ok;
+
+  
+  //n 
+  fscanf(fin,"%d",&n);
+
+  char a[n][n];
+  char s[100];
+  int cnt=0;
+
+  for(i=0;i<n;i++)
+    for(j=0;j<n;j++)
+      {
+       fscanf(fin," %c",&a[i][j]);//spațiul înainte de %c pentru a ignora spațiile sau caracterele de nouă linie rămase în buffer
+      }
+
+
+  fscanf(fin,"%s",s);
+  int ns;
+  ns=strlen(s);
+
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n;j++)
+        {
+            if(a[i][j]==s[0])
+            {
+                //printf(" am gasit i %d j %d\n",i+1,j+1);
+
+            //nord
+                if(i>=ns-1)
+                {
+                    ok=0;
+                    for(ii=i,aux=0;ii>=0,aux<ns;ii--,aux++)
+                    {
+                        if(a[ii][j]!=s[aux])
+                            ok++;
+
+                    }
+                    if(ok==0)
+                    {
+                        printf("de la linia %d coloana %d in sus\n",i,j);
+                        cnt++;
+                    }
+
+                }
+
+            //sud
+
+                if(i<=ns-1)
+                {
+                    ok=0;
+                    for(ii=i,aux=0;ii<n,aux<ns;ii++,aux++)
+                        if(a[ii][j]!=s[aux])
+                            ok++;
+
+                    if(ok==0)
+                    {
+                        printf("de la linia %d coloana %d in jos\n",i,j);
+                        cnt++;
+                    }
+                    
+
+                }
+            //vest
+
+                if(j+ns-1<n)
+                {
+                    ok=0;
+                    for(jj=j,aux=0;jj<n,aux<ns;jj++,aux++)
+                        if(a[i][jj]!=s[aux])
+                            ok++;
+                    if(ok==0)
+                    {
+                        printf("de la linia %d coloana %d in vest\n",i,j);
+                        cnt++;
+                    }
+                       
+
+                }
+
+            //est
+
+                if(j+ns-1>n)
+                {
+                    ok=0;
+                    for(jj=j,aux=0;jj>=0,aux<ns;jj--,aux++)
+                        if(a[i][jj]!=s[aux])
+                            ok++;
+                    if(ok==0)
+                    {
+                        printf("de la linia %d coloana %d in est\n",i,j);
+                        cnt++;
+                    }
+
+                }
+            }
+        }
+    }
+
+  for(i=0;i<n;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+	        printf("%c ",a[i][j]);
+      }
+      printf("\n");
+    }
+
+  printf("\n");
+  printf("%s\n",s);
+  printf("%d\n",ns);
+
+  if(cnt==0)
+    printf("nu am gasit\n");
+
+  fclose(fin);
+  
+  return 0;
+}
+
+
