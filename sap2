@@ -1,0 +1,390 @@
+PB1
+/*
+Se cere un număr n și apoi un vector de n rezultate ale
+studenților la un examen. Fiecare rezultat
+este definit prin (nume,nota). Se cere să se sorteze folosind qsort vectorul în ordinea notelor, notele cele mai mari
+fiind primele. Dacă două note sunt identice, rezultatele respective se vor sorta în ordinea alfabetică a numelor.
+*/
+
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+ 
+typedef struct{
+    char nume[50];
+    int nota;
+}rez;
+
+/*
+
+*/
+
+int cmprez(const void *elem1,const void *elem2)
+{
+    int x;
+
+    const rez *p1=(const rez*)elem1;
+    const rez *p2=(const rez*)elem2;
+
+    
+    if(p1->nota>p2->nota)
+        return -1;
+    else if(p1->nota<p2->nota)
+        return 1;
+    else if(p1->nota==p2->nota)
+    {
+        // ascii table a mai mic ca z
+        x=strcmp(p1->nume,p2->nume);
+        if(x<0)
+            return -1;
+        else if(x>0)
+            return 1;
+        else if(x==0)
+            return 0;
+
+    }
+    return 0;
+}
+
+
+int main(void)
+{
+    FILE *fin;
+    
+    fin=fopen("date.txt","r");
+
+    int n;
+    int i;
+
+    fscanf(fin,"%d",&n);
+
+    rez a[n];
+
+    for(i=0;i<n;i++)
+    {
+        fscanf(fin,"%s",&a[i].nume);
+        fscanf(fin,"%d",&a[i].nota);
+
+    }
+
+    for(i=0;i<n;i++)
+    {
+        printf("nume:%s si nota:%d\n",a[i].nume,a[i].nota);
+    }
+    printf("\n");
+
+    qsort(a,n,sizeof(rez),cmprez);
+
+    for(i=0;i<n;i++)
+    {
+        printf("nume:%s si nota:%d\n",a[i].nume,a[i].nota);
+    }
+
+    fclose(fin);
+    return 0;
+}
+PB2
+/*
+Să se implementeze o funcție care primește ca parametri un vector de întregi, numărul elementelor
+din vector transmis prin adresă și un predicat care testează dacă un întreg îndeplinește o anumită condiție. Funcția
+va sterge din vector toate elementele care nu îndeplinesc condiția dată și va actualiza numărul elementelor cu
+numărul de elemente rămas în vector. Să se testeze funcția cu un predicat care testează dacă un număr este
+negativ și să se afișeze vectorul rezultat.
+*/
+
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+ 
+
+int negativ(int e)
+{
+    if(e>=0)
+        return 0;
+    else
+        return 1;
+
+}
+
+void verificare(int *v,int* n ,int(*cond)(int))
+{
+    int i,j;
+    for(i=0;i<(*n);i++)
+    {
+        if(cond(v[i])==1)
+        {
+            for(j=i+1;j<(*n);j++)
+                v[j-1]=v[j];
+            i--;
+            (*n)--;
+        }
+    }
+   // return n;
+}
+
+int main(void)
+{
+    FILE *fin;
+    
+    fin=fopen("date.txt","r");
+
+    int n,nn;
+    int i;
+
+    fscanf(fin,"%d",&n);
+
+    int v[n];
+
+    for(i=0;i<n;i++)
+    {
+        fscanf(fin,"%d",&v[i]);
+    }
+
+    for(i=0;i<n;i++)
+        printf("%d ",v[i]);
+    printf("\n");
+
+    verificare(v,&n,negativ);
+    //n=nn;
+
+    for(i=0;i<n;i++)
+        printf("%d ",v[i]);
+    printf("\n");
+
+    
+    fclose(fin);
+    return 0;
+    
+}
+PB3
+/*
+Se introduce un număr întreg n<10 și apoi n numere de tip float. Să se folosească funcția qsort
+pentru a sorta aceste numere în mod crescător. Se va introduce apoi un număr x de tip float. Folosind funcția
+bsearch, să se determine dacă x există în vectorul sortat. Se pot consulta paginile de manual pentru funcțiile qsort
+și bsearch.
+*/
+
+
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+ 
+
+int cmpe(const void *elem1,const void *elem2)
+{
+    
+    const float *p1=(const float*)elem1;
+    const float *p2=(const float*)elem2;
+
+    if( *p1< *p2)
+        return -1;
+    if(*p1>*p2)
+        return 1;
+    return 0;
+}
+
+int main(void)
+{
+    FILE *fin;
+    
+    fin=fopen("date.txt","r");
+
+    int n,nn;
+    int i;
+    float x;
+
+    fscanf(fin,"%d",&n);
+
+    float v[n];
+    float *p;
+
+    for(i=0;i<n;i++)
+    {
+        fscanf(fin,"%f",&v[i]);
+    }
+
+    fscanf(fin,"%d",&x);
+    p=&x;
+
+    for(i=0;i<n;i++)
+        printf("%f ",v[i]);
+    printf("\n");
+
+    qsort(v,n,sizeof(float),cmpe);
+
+    for(i=0;i<n;i++)
+        printf("%f ",v[i]);
+    printf("\n");
+
+    if((bsearch(p,v,n,sizeof(float),cmpe))==NULL)
+        printf("nu\n");
+    else
+        printf("da\n");
+    
+    fclose(fin);
+    return 0;
+}
+
+EXAMEN1
+#include <stdio.h>
+#include <math.h>
+
+void tabela_functie(double (*func)(double), double A, double B, double P)
+{
+    printf("x\t| f(x)\n");
+    printf("--------------------\n");
+
+    for (double x = A; x <= B; x = x + P)
+    {
+        double result = func(x);
+        printf("%.2f\t| %.2f\n", x, result);
+    }
+}
+
+double functie1(double x)
+{
+    return (x * x * x + 4) / (x * x + 5);
+}
+
+double functie2(double x)
+{
+    return x + 10;
+}
+
+double functie3(double x)
+{
+    return 2 * x * x - 1;
+}
+
+int main()
+{
+    double A, B, P;
+    printf("Introduceti intervalul [A, B]: ");
+    scanf("%lf %lf", &A, &B);
+
+    printf("Introduceti pasul P: ");
+    scanf("%lf", &P);
+
+    printf("\nTabelare functie 1:\n");
+    tabela_functie(functie1, A, B, P);
+
+    printf("\nTabelare functie 2:\n");
+    tabela_functie(functie2, A, B, P);
+
+    printf("\nTabelare functie 3:\n");
+    tabela_functie(functie3, A, B, P);
+
+    return 0;
+}
+
+EXAMEN2
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
+int lungimeSir(const char *cuvant) {
+    return strlen(cuvant);
+}
+
+int numarVocale(const char *cuvant) {
+    int numar = 0;
+    for (int i = 0; cuvant[i] != '\0'; i++) {
+        if (strchr("aeiouAEIOU", cuvant[i]) != NULL) {
+            numar++;
+        }
+    }
+    return numar;
+}
+
+int numarLitereMari(const char *cuvant) {
+    int numar = 0;
+    for (int i = 0; cuvant[i] != '\0'; i++) {
+        if (cuvant[i] >= 'A' && cuvant[i] <= 'Z') {
+            numar++;
+        }
+    }
+    return numar;
+}
+
+int diferentaASCII(const char *cuvant) {
+    if (cuvant[0] == '\0' || cuvant[strlen(cuvant) - 1] == '\0') {
+        return 0;
+    }
+
+    return cuvant[0] - cuvant[strlen(cuvant) - 1];
+}
+
+int main()
+{
+    FILE *fin;
+    fin=fopen("date.txt","r");
+
+    if (fin == NULL) {
+        perror("Eroare la deschiderea fisierului");
+        return 1;
+    }
+
+    char cuvant[50];
+    char **v=NULL;
+    char **auxv;
+    int n=0;
+
+    char *aux;
+
+    while(fscanf(fin,"%s",cuvant)==1)
+    {
+        aux=(char*)malloc((strlen(cuvant)+1)*sizeof(char));
+
+        if(aux==NULL)
+        {
+            perror("Eroare la alocarea dinamica");
+            free(v);
+            return 1;
+        }
+
+        strcpy(aux,cuvant);
+
+        auxv=(char**)realloc(v,(n+1)*sizeof(char*));
+        
+        if(auxv==NULL)
+        {
+            free(v);
+            free(aux);
+            perror("Eroare la alocarea dinamica");
+            return 1;
+        }
+
+        v=auxv;
+        v[n]=aux;
+        n++;
+    }
+
+    int (*functii[])(const char *) = {lungimeSir, numarVocale, numarLitereMari, diferentaASCII};
+
+
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < sizeof(functii) / sizeof(functii[0]); j++)
+        {
+            printf("Functia %d: %d\n", j + 1, functii[j](v[i]));
+        }
+        printf("..........\n");
+    }
+
+    for (int i = 0; i < n; i++) {
+        free(v[i]);
+    }
+    free(v);
+
+
+    fclose(fin);
+
+
+   
+    return 0;
+}
