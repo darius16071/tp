@@ -1,0 +1,377 @@
+Aplicația 4.0: Să se creeze o structură care reține următoarele informații despre un student: nume (maxim 20 de
+caractere), nota. Să se citească un element din structură și să se afișeze pe ecran.
+
+#include <stdio.h>
+#include <string.h>
+
+struct Student {
+    char nume[21];
+    int nota;
+};
+
+int main() {
+    struct Student student;
+    printf("Introduceti numele studentului: ");
+    scanf("%20s", student.nume);
+    printf("Introduceti nota studentului: ");
+    scanf("%d", &student.nota);
+    printf("\nInformatii despre student:\n");
+    printf("Nume: %s\n", student.nume);
+    printf("Nota: %d\n", student.nota);
+    return 0;
+}
+
+Aplicația 4.1: Să se codifice cu ajutorul structurilor cu câmpuri pe biți informațiile despre un fișier: nume (șir de
+maxim 15 caractere), dimensiunea acestuia (int - număr de octeți, maxim 1024 octeți), tipul acestuia (.txt - 0, .doc
+- 1, .xls – 2), tipul fisierului (normal – 0, read-only – 1). Să se citească informația despre un fișier, și să se afișeze
+pe ecran.
+
+#include <stdio.h>
+#include <string.h>
+
+struct FileInfo {
+    char nume[16];
+    unsigned int dimensiune : 10;
+    unsigned int tip : 2;
+    unsigned int tip_fisier : 1;
+};
+
+int main() {
+    struct FileInfo file;
+    printf("Introduceti numele fisierului: ");
+    scanf("%15s", file.nume);
+    printf("Introduceti dimensiunea fisierului in octeti (maxim 1024): ");
+    scanf("%u", &file.dimensiune);
+    printf("Selectati tipul fisierului:\n");
+    printf("0 - .txt\n");
+    printf("1 - .doc\n");
+    printf("2 - .xls\n");
+    scanf("%u", &file.tip);
+    printf("Selectati tipul de fisier:\n");
+    printf("0 - normal\n");
+    printf("1 - read-only\n");
+    scanf("%u", &file.tip_fisier);
+    printf("\nInformatii despre fisier:\n");
+    printf("Nume: %s\n", file.nume);
+    printf("Dimensiune: %u octeti\n", file.dimensiune);
+    printf("Tip: ");
+    switch (file.tip) {
+        case 0:
+            printf(".txt\n");
+            break;
+        case 1:
+            printf(".doc\n");
+            break;
+        case 2:
+            printf(".xls\n");
+            break;
+        default:
+            printf("Tip necunoscut\n");
+    }
+    printf("Tip fisier: %s\n", file.tip_fisier ? "read-only" : "normal");
+    return 0;
+}
+
+
+Aplicația 4.2: Cu ajutorul structurii de la problema mai sus să se salveze într-un vector de structuri declarat static
+informații despre mai multe fișiere (maxim 10). Să se citească de la tastatură informațiile despre fișiere și să se
+salveze în fișierul memorie.txt.
+
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_FILES 10
+
+struct FileInfo {
+    char nume[16];
+    unsigned int dimensiune : 10;
+    unsigned int tip : 2;
+    unsigned int tip_fisier : 1;
+};
+
+int main() {
+    struct FileInfo files[MAX_FILES];
+    FILE *fptr;
+    int i;
+
+    fptr = fopen("memorie.txt", "w");
+    if (fptr == NULL) {
+        printf("Eroare la deschiderea fisierului.\n");
+        return 1;
+    }
+
+    for (i = 0; i < MAX_FILES; i++) {
+        printf("Introduceti numele fisierului %d: ", i + 1);
+        scanf("%15s", files[i].nume);
+        printf("Introduceti dimensiunea fisierului %d in octeti (maxim 1024): ", i + 1);
+        scanf("%u", &files[i].dimensiune);
+        printf("Selectati tipul fisierului %d:\n", i + 1);
+        printf("0 - .txt\n");
+        printf("1 - .doc\n");
+        printf("2 - .xls\n");
+        scanf("%u", &files[i].tip);
+        printf("Selectati tipul de fisier %d:\n", i + 1);
+        printf("0 - normal\n");
+        printf("1 - read-only\n");
+        scanf("%u", &files[i].tip_fisier);
+    }
+
+    for (i = 0; i < MAX_FILES; i++) {
+        fprintf(fptr, "Nume: %s\n", files[i].nume);
+        fprintf(fptr, "Dimensiune: %u octeti\n", files[i].dimensiune);
+        fprintf(fptr, "Tip: ");
+        switch (files[i].tip) {
+            case 0:
+                fprintf(fptr, ".txt\n");
+                break;
+            case 1:
+                fprintf(fptr, ".doc\n");
+                break;
+            case 2:
+                fprintf(fptr, ".xls\n");
+                break;
+            default:
+                fprintf(fptr, "Tip necunoscut\n");
+        }
+        fprintf(fptr, "Tip fisier: %s\n", files[i].tip_fisier ? "read-only" : "normal");
+        fprintf(fptr, "\n");
+    }
+
+    fclose(fptr);
+    printf("Informatiile despre fisiere au fost salvate in memorie.txt\n");
+
+    return 0;
+}
+
+Aplicația 4.3: Modificați problema de mai sus astfel încât vectorul de structuri să fie alocat dinamic.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct FileInfo {
+    char nume[16];
+    unsigned int dimensiune : 10;
+    unsigned int tip : 2;
+    unsigned int tip_fisier : 1;
+};
+
+int main() {
+    struct FileInfo *files;
+    FILE *fptr;
+    int num_files, i;
+
+    printf("Introduceti numarul de fisiere (maxim 10): ");
+    scanf("%d", &num_files);
+
+    if (num_files > 10 || num_files < 1) {
+        printf("Numarul de fisiere trebuie sa fie intre 1 si 10.\n");
+        return 1;
+    }
+
+    files = (struct FileInfo *)malloc(num_files * sizeof(struct FileInfo));
+    if (files == NULL) {
+        printf("Eroare la alocarea memoriei.\n");
+        return 1;
+    }
+
+    fptr = fopen("memorie.txt", "w");
+    if (fptr == NULL) {
+        printf("Eroare la deschiderea fisierului.\n");
+        return 1;
+    }
+
+    for (i = 0; i < num_files; i++) {
+        printf("Introduceti numele fisierului %d: ", i + 1);
+        scanf("%15s", files[i].nume);
+        printf("Introduceti dimensiunea fisierului %d in octeti (maxim 1024): ", i + 1);
+        scanf("%u", &files[i].dimensiune);
+        printf("Selectati tipul fisierului %d:\n", i + 1);
+        printf("0 - .txt\n");
+        printf("1 - .doc\n");
+        printf("2 - .xls\n");
+        scanf("%u", &files[i].tip);
+        printf("Selectati tipul de fisier %d:\n", i + 1);
+        printf("0 - normal\n");
+        printf("1 - read-only\n");
+        scanf("%u", &files[i].tip_fisier);
+    }
+
+    for (i = 0; i < num_files; i++) {
+        fprintf(fptr, "Nume: %s\n", files[i].nume);
+        fprintf(fptr, "Dimensiune: %u octeti\n", files[i].dimensiune);
+        fprintf(fptr, "Tip: ");
+        switch (files[i].tip) {
+            case 0:
+                fprintf(fptr, ".txt\n");
+                break;
+            case 1:
+                fprintf(fptr, ".doc\n");
+                break;
+            case 2:
+                fprintf(fptr, ".xls\n");
+                break;
+            default:
+                fprintf(fptr, "Tip necunoscut\n");
+        }
+        fprintf(fptr, "Tip fisier: %s\n", files[i].tip_fisier ? "read-only" : "normal");
+        fprintf(fptr, "\n");
+    }
+
+    fclose(fptr);
+    printf("Informatiile despre fisiere au fost salvate in memorie.txt\n");
+
+    free(files);
+
+    return 0;
+}
+
+Aplicația 4.4: Folosind câmpuri pe biți, definiţi o structură pentru memorarea următoarelor informaţii despre
+animale:
+● numărul de picioare: număr întreg, minim 0 (ex. şarpe), maxim 1000 (ex. miriapod)
+● greutatea în kg: număr real
+● periculos pentru om: da/nu
+● abrevierea ştiinţifică a speciei: şir de maxim 8 caractere
+● vârsta maximă în ani: număr întreg, minim 0, maxim 2000
+Unde este posibil, codificaţi informaţiile prin numere întregi de dimensiune cât mai mică, spre exemplu “da”=1,
+“nu”=0. Definiţi structura în aşa fel încât să ocupe spaţiul minim de memorie posibil. Afişaţi spaţiul de memorie
+ocupat, folosind operatorul sizeof. Folosind structura definită, citiţi de la tastatură informaţii despre un animal, iar
+pe urmă afişaţi-le pe ecran.
+Exemplu: valoare=147000, unitate:gram => 147 kilogram
+
+#include <stdio.h>
+#include <string.h>
+
+struct AnimalInfo {
+    unsigned int nr_picioare : 10;
+    float greutate;
+    unsigned int periculos_om : 1;
+    char abreviere_specie[9];
+    unsigned int varsta_maxima : 11;
+};
+
+int main() {
+    struct AnimalInfo animal;
+
+    printf("Introduceti numarul de picioare al animalului (0 - 1000): ");
+    scanf("%u", &animal.nr_picioare);
+    printf("Introduceti greutatea animalului in kg: ");
+    scanf("%f", &animal.greutate);
+    printf("Este animalul periculos pentru om? (1 pentru da, 0 pentru nu): ");
+    scanf("%u", &animal.periculos_om);
+    printf("Introduceti abrevierea stiintifica a speciei (maxim 8 caractere): ");
+    scanf("%8s", animal.abreviere_specie);
+    printf("Introduceti varsta maxima a animalului in ani (0 - 2000): ");
+    scanf("%u", &animal.varsta_maxima);
+
+    printf("\nInformatii despre animal:\n");
+    printf("Numar de picioare: %u\n", animal.nr_picioare);
+    printf("Greutate: %.2f kg\n", animal.greutate);
+    printf("Periculos pentru om: %s\n", animal.periculos_om ? "da" : "nu");
+    printf("Abreviere stiintifica a speciei: %s\n", animal.abreviere_specie);
+    printf("Varsta maxima: %u ani\n", animal.varsta_maxima);
+
+    printf("\nSpatiul de memorie ocupat de structura: %zu bytes\n", sizeof(animal));
+
+    return 0;
+}
+
+Aplicația 4.5: Să se codifice următoarele informații despre un medicament, astfel încât ele să ocupe în total un
+singur octet. Să se scrie un program care să citească datele unui medicament și ulterior să le afișeze.
+● gradul de periculozitate: scăzută, medie, mare
+● dacă se eliberează doar pe bază de rețetă: da, nu
+● vârsta minimă de administrare: 1...18 ani inclusiv
+
+#include <stdio.h>
+
+struct Medicament {
+    unsigned int periculozitate : 2;
+    unsigned int reteta : 1;
+    unsigned int varsta_minima : 5;
+};
+
+int main() {
+    struct Medicament medicament;
+
+    printf("Introduceti gradul de periculozitate (0 - scăzută, 1 - medie, 2 - mare): ");
+    scanf("%u", &medicament.periculozitate);
+    printf("Se elibereaza doar pe baza de reteta? (0 - nu, 1 - da): ");
+    scanf("%u", &medicament.reteta);
+    printf("Introduceti varsta minima de administrare (1 - 18 ani): ");
+    scanf("%u", &medicament.varsta_minima);
+
+    printf("\nInformatii despre medicament:\n");
+    printf("Grad de periculozitate: ");
+    switch (medicament.periculozitate) {
+        case 0:
+            printf("scăzută\n");
+            break;
+        case 1:
+            printf("medie\n");
+            break;
+        case 2:
+            printf("mare\n");
+            break;
+        default:
+            printf("Necunoscut\n");
+    }
+    printf("Se eliberează doar pe bază de rețetă: %s\n", medicament.reteta ? "da" : "nu");
+    printf("Vârsta minimă de administrare: %u ani\n", medicament.varsta_minima);
+
+    printf("\nDimensiunea structurii: %zu bytes\n", sizeof(medicament));
+
+    return 0;
+}
+
+Aplicația 4.6: Se consideră că o măsurătoare are asociată unitatea de măsură (gram, metru, litru) și multiplicatorul
+acesteia (pico, nano, mili, centi, deci, deca, hecto, kilo, mega, giga).
+● Să se codifice o măsurătoare astfel încât să conțină o valoare întreagă pozitivă care să acopere un interval
+cât mai mare de valori, unitatea de măsură și multiplicatorul acesteia. O măsurătoare va ocupa exact 2
+octeți.
+● Să se citească o valoare unsigned și o unitate de măsură. La citire nu există multiplicator. Să se determine
+multiplicatorul astfel încât valoarea stocată să fie cât mai mică, fără a se pierde precizie, iar apoi să se
+stocheze într-o măsurătoare. Dacă valoarea nu încape, se va afișa o eroare. Să se afișeze toate câmpurile
+măsurătorii.
+
+#include <stdio.h>
+
+struct Masuratoare {
+    unsigned int valoare;
+    char unitate;
+    char multiplicator;
+};
+
+char determina_multiplicator(unsigned int valoare) {
+    if (valoare < 1000) return ' ';
+    if (valoare < 1000000) return 'k';
+    if (valoare < 1000000000) return 'M';
+    return '\0';
+}
+
+int main() {
+    struct Masuratoare masuratoare;
+    unsigned int valoare;
+
+    printf("Introduceti valoarea masurarii: ");
+    scanf("%u", &valoare);
+    printf("Introduceti unitatea de masura: ");
+    scanf(" %c", &masuratoare.unitate);
+
+    masuratoare.multiplicator = determina_multiplicator(valoare);
+    if (masuratoare.multiplicator == '\0') {
+        printf("Eroare: Valoarea depaseste limita suportata.\n");
+        return 1;
+    }
+
+    masuratoare.valoare = valoare;
+
+    printf("\nMasuratoare:\n");
+    printf("Valoare: %u\n", masuratoare.valoare);
+    printf("Unitate de masura: %c\n", masuratoare.unitate);
+    printf("Multiplicator: %c\n", masuratoare.multiplicator);
+
+    return 0;
+}
+
+
+
