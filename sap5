@@ -1,0 +1,405 @@
+Aplicația 5.2: Scrieți un program care copiază conținutul unui fișier sursă într-un fișier destinație. Numele fișierelor se citesc din linia de comandă. Pentru eficiența copierii, programul va citi câte un bloc de maxim 4096 de octeți, pe care îl va scrie în destinație.
+Exemplu: ./copiere src.dat dst.dat                    -> copiază src.dat în dst.dat
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_BUFFER_SIZE 4096
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Utilizare: %s <sursă> <destinație>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *src_file, *dst_file;
+    char buffer[MAX_BUFFER_SIZE];
+    size_t bytes_read;
+
+    src_file = fopen(argv[1], "rb");
+    if (src_file == NULL) {
+        perror("Eroare deschidere fișier sursă");
+        return 1;
+    }
+
+    dst_file = fopen(argv[2], "wb");
+    if (dst_file == NULL) {
+        perror("Eroare deschidere fișier destinație");
+        fclose(src_file);
+        return 1;
+    }
+
+    while ((bytes_read = fread(buffer, 1, MAX_BUFFER_SIZE, src_file)) > 0) {
+        if (fwrite(buffer, 1, bytes_read, dst_file) != bytes_read) {
+            perror("Eroare scriere în fișier destinație");
+            fclose(src_file);
+            fclose(dst_file);
+            return 1;
+        }
+    }
+
+    fclose(src_file);
+    fclose(dst_file);
+
+    printf("Conținutul fișierului %s a fost copiat în %s.\n", argv[1], argv[2]);
+
+    return 0;
+}
+
+Aplicația 5.3: Se citesc m și n de la tastatură, iar apoi o matrice a[m][n] cu elemente de tip întreg. Să se scrie matricea într-un fișier binar, prima oară scriindu-se m și n, iar apoi elementele, așa cum sunt dispuse ele în memorie. Să se citească matricea din fișier într-o variabilă b și să se afișeze.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int m, n;
+    
+    printf("Introduceți numărul de rânduri și coloane ale matricei: ");
+    scanf("%d %d", &m, &n);
+
+    int matrix[m][n];
+
+    printf("Introduceți elementele matricei:\n");
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("Elementul a[%d][%d]: ", i, j);
+            scanf("%d", &matrix[i][j]);
+        }
+    }
+
+    FILE *file_out = fopen("matrice.dat", "wb");
+    if (file_out == NULL) {
+        perror("Eroare la deschiderea fișierului pentru scriere");
+        return 1;
+    }
+
+    fwrite(&m, sizeof(int), 1, file_out);
+    fwrite(&n, sizeof(int), 1, file_out);
+    fwrite(matrix, sizeof(int), m * n, file_out);
+
+    fclose(file_out);
+
+    int b[m][n];
+
+    FILE *file_in = fopen("matrice.dat", "rb");
+    if (file_in == NULL) {
+        perror("Eroare la deschiderea fișierului pentru citire");
+        return 1;
+    }
+
+    fread(&m, sizeof(int), 1, file_in);
+    fread(&n, sizeof(int), 1, file_in);
+    fread(b, sizeof(int), m * n, file_in);
+
+    fclose(file_in);
+
+    printf("Matricea citită din fișier:\n");
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%d ", b[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
+
+Aplicația 5.4: Să se modifice exemplul 4, astfel încât la începutul fișierului să fie scris numărul de produse. Citirea va fi modificată pentru a folosi această informație, în loc de a se testa sfârșitul de fișier.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Product {
+    char name[50];
+    float price;
+    int quantity;
+};
+
+int main() {
+    int num_products;
+
+    printf("Introduceți numărul de produse: ");
+    scanf("%d", &num_products);
+
+    struct Product products[num_products];
+
+    for (int i = 0; i < num_products; i++) {
+        printf("Introduceți numele, prețul și cantitatea pentru produsul %d:\n", i + 1);
+        printf("Nume: ");
+        scanf("%s", products[i].name);
+        printf("Preț: ");
+        scanf("%f", &products[i].price);
+        printf("Cantitate: ");
+        scanf("%d", &products[i].quantity);
+    }
+
+    FILE *file_out = fopen("produse.dat", "wb");
+    if (file_out == NULL) {
+        perror("Eroare la deschiderea fișierului pentru scriere");
+        return 1;
+    }
+
+    fwrite(&num_products, sizeof(int), 1, file_out);
+    fwrite(products, sizeof(struct Product), num_products, file_out);
+
+    fclose(file_out);
+
+    FILE *file_in = fopen("produse.dat", "rb");
+    if (file_in == NULL) {
+        perror("Eroare la deschiderea fișierului pentru citire");
+        return 1;
+    }
+
+    fread(&num_products, sizeof(int), 1, file_in);
+    struct Product read_products[num_products];
+    fread(read_products, sizeof(struct Product), num_products, file_in);
+
+    fclose(file_in);
+
+    printf("Produsele citite din fișier:\n");
+    for (int i = 0; i < num_products; i++) {
+        printf("Produsul %d:\n", i + 1);
+        printf("Nume: %s\n", read_products[i].name);
+        printf("Preț: %.2f\n", read_products[i].price);
+        printf("Cantitate: %d\n", read_products[i].quantity);
+    }
+
+    return 0;
+}
+
+Aplicația 5.5: Să se scrie un program similar cu hexdump, care primește un nume de fișier în linia de comandă, citește câte 16 octeți din el și îi afișează pe câte o linie. Fiecare linie începe cu offsetul ei în fișier, afișat în hexazecimal pe 8 cifre cu 0 în față, după care valorile hexa ale celor 16 octeți pe câte 2 cifre și în final caracterele. Dacă codul unui caracter este în intervalul 32-255 se va afișa ca atare, altfel se va afișa un punct în locul său. Dacă ultima linie este incompletă, se va completa cu octeți de 0.
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define BUFFER_SIZE 16
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Utilizare: %s <nume_fișier>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "rb");
+    if (file == NULL) {
+        perror("Eroare la deschiderea fișierului");
+        return 1;
+    }
+
+    unsigned char buffer[BUFFER_SIZE];
+    size_t bytes_read;
+    long offset = 0;
+
+    while ((bytes_read = fread(buffer, 1, BUFFER_SIZE, file)) > 0) {
+        printf("%08lx  ", offset);
+
+        for (size_t i = 0; i < BUFFER_SIZE; i++) {
+            if (i < bytes_read) {
+                printf("%02x ", buffer[i]);
+            } else {
+                printf("   ");
+            }
+
+            if (i == 7) {
+                printf(" ");
+            }
+        }
+
+        printf(" ");
+
+        for (size_t i = 0; i < bytes_read; i++) {
+            if (buffer[i] >= 32 && buffer[i] <= 255) {
+                printf("%c", buffer[i]);
+            } else {
+                printf(".");
+            }
+        }
+
+        printf("\n");
+
+        offset += bytes_read;
+    }
+
+    fclose(file);
+
+    return 0;
+}
+
+Aplicația 5.6: Să se scrie un program care primește 2 fișiere în linia de comandă și le compară între ele. Pentru fiecare octet diferit găsit, se afișează offsetul acestuia și valorile sale din fiecare fișier, în hexazecimal, pe câte 2 cifre. Dacă fișierele sunt de dimensiuni diferite, în final se vor afișa toți octeții din fișierul mai mare. Dacă fișierele sunt identice, programul nu va afișa nimic.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Utilizare: %s <fișier1> <fișier2>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file1 = fopen(argv[1], "rb");
+    FILE *file2 = fopen(argv[2], "rb");
+
+    if (file1 == NULL || file2 == NULL) {
+        perror("Eroare la deschiderea fișierului");
+        return 1;
+    }
+
+    int byte_offset = 0;
+    int byte1, byte2;
+
+    while (1) {
+        byte1 = fgetc(file1);
+        byte2 = fgetc(file2);
+
+        if (byte1 != byte2 || byte1 == EOF || byte2 == EOF) {
+            printf("Offset: %d, Fișier1: %02X, Fișier2: %02X\n", byte_offset, byte1, byte2);
+        }
+
+        if (byte1 == EOF && byte2 == EOF) {
+            break;
+        }
+
+        byte_offset++;
+    }
+
+    fclose(file1);
+    fclose(file2);
+
+    return 0;
+}
+
+Aplicația 5.7: Un program primește în linia de comandă un nume de fișier, un offset dat în hexazecimal și apoi o serie de octeți, specificați tot în hexazecimal. Programul va scrie în fișierul specificat, începând de la offsetul dat toți octeții primiți în linia de comandă. Restul fișierului va rămâne nemodificat.
+Exemplu: ./inlocuire 1.dat 4a0f 9e b0 51          -> scrie octeții {9e, b0, 51} în fișierul 1.dat, începând cu poziția 4a0f
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    if (argc < 4) {
+        printf("Utilizare: %s <nume_fișier> <offset_hex> <octeți_hex>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "r+b");
+
+    if (file == NULL) {
+        perror("Eroare la deschiderea fișierului");
+        return 1;
+    }
+
+    long offset = strtol(argv[2], NULL, 16);
+
+    fseek(file, offset, SEEK_SET);
+
+    for (int i = 3; i < argc; i++) {
+        unsigned char byte = (unsigned char)strtol(argv[i], NULL, 16);
+        fwrite(&byte, sizeof(unsigned char), 1, file);
+    }
+
+    fclose(file);
+
+    return 0;
+}
+
+Aplicația 5.8: Să se scrie un program care primește în linia de comandă un nume de fișier și o serie de octeți, dați în hexazecimal. Programul va afișa toate pozițiile din fișier la care se află secvența de octeți specificați.
+Exemplu: ./cautare 1.dat 01 aa b2 45        -> caută în fișierul 1.dat secvența {01, aa, b2, 45} și afișează toate pozițiile la care o găsește
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    if (argc < 3) {
+        printf("Utilizare: %s <nume_fișier> <octeți_hex>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "rb");
+
+    if (file == NULL) {
+        perror("Eroare la deschiderea fișierului");
+        return 1;
+    }
+
+    int pattern_len = argc - 2;
+    unsigned char *pattern = malloc(pattern_len);
+
+    for (int i = 2; i < argc; i++) {
+        pattern[i - 2] = (unsigned char)strtol(argv[i], NULL, 16);
+    }
+
+    int byte;
+    long offset = 0;
+    int match_count = 0;
+
+    while ((byte = fgetc(file)) != EOF) {
+        if (byte == pattern[0]) {
+            int match = 1;
+            for (int i = 1; i < pattern_len; i++) {
+                byte = fgetc(file);
+                if (byte == EOF || byte != pattern[i]) {
+                    match = 0;
+                    break;
+                }
+            }
+
+            if (match) {
+                printf("Secvența găsită la poziția %ld.\n", offset);
+                match_count++;
+            }
+        }
+        offset++;
+    }
+
+    if (match_count == 0) {
+        printf("Secvența nu a fost găsită în fișier.\n");
+    }
+
+    fclose(file);
+    free(pattern);
+
+    return 0;
+}
+
+Aplicația 5.9: Să se scrie un program care primește o serie de n programe în linia de comandă și le concatenează pe primele n-1 într-un nou fișier având numele specificat pe ultima poziție din linia de comandă.
+Exemplu: ./concat 1.dat 2.dat 3.dat rez.dat       -> concatenează conținutul fișierelor {1.dat, 2.dat, 3.dat} într-un nou fișier, denumit rez.dat
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    if (argc < 4) {
+        printf("Utilizare: %s <fișier1> <fișier2> ... <fișier_rezultat>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *result_file = fopen(argv[argc - 1], "wb");
+
+    if (result_file == NULL) {
+        perror("Eroare la deschiderea fișierului rezultat");
+        return 1;
+    }
+
+    for (int i = 1; i < argc - 1; i++) {
+        FILE *source_file = fopen(argv[i], "rb");
+
+        if (source_file == NULL) {
+            perror("Eroare la deschiderea fișierului sursă");
+            fclose(result_file);
+            return 1;
+        }
+
+        int byte;
+        while ((byte = fgetc(source_file)) != EOF) {
+            fputc(byte, result_file);
+        }
+
+        fclose(source_file);
+    }
+
+    fclose(result_file);
+
+    printf("Fișierele concatenate au fost scrise în %s.\n", argv[argc - 1]);
+
+    return 0;
+}
