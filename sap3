@@ -1,0 +1,161 @@
+ex1
+#include <stdio.h>
+/*
+Implementati 
+pe calculator structura de date stiva, 
+asa cum este descrisa in laborator.
+*/
+
+#define MAX_SIZE 100
+int top = -1;
+
+int stack[MAX_SIZE];
+
+void push(int item)
+{
+    if(top == MAX_SIZE-1) 
+    {
+        printf("Stiva este plina\n");
+        return;
+    }
+    stack[++top] = item;
+}
+
+int pop()
+{
+    if(top == -1)
+    {
+        printf("Stiva este goala\n");
+        return -1;
+    }
+    return stack[top--];
+}
+
+void display()
+{
+    if(top == -1)
+    {
+        printf("Stiva este goala\n");
+        return;
+    }
+    printf("Elementele din stiva sunt: ");
+    for(int i=top; i>=0; i--)
+        printf("%d ",stack[i]);
+    printf("\n");
+}
+
+int main(void)
+{
+    push(10);
+    push(20);
+    push(30);
+    display();
+    printf("Elementul extras din stiva: %d\n",pop());
+    display();
+
+    return 0;
+}
+ex2
+#include <stdio.h>
+/*
+Implementati pe calculator structura de date coada, asa cum este descrisa in
+laborator.
+*/
+
+#define MAX_SIZE 100
+
+int front = -1, rear = -1;
+
+int queue[MAX_SIZE];
+
+void enqueue(int item)
+{
+    if(rear == MAX_SIZE-1)
+    {
+        printf("Coada este plina\n");
+        return;
+    }
+    if(front == -1)
+        front = 0;
+    queue[++rear] = item;
+}
+
+int dequeue()
+{
+    if(front == -1 || front > rear)
+    {
+        printf("Coada este goala\n");
+        return -1;
+    }
+    return queue[front++];
+}
+
+void display()
+{
+    if(front == -1 || front > rear)
+    {
+        printf("Coada este goala\n");
+        return;
+    }
+    printf("Elementele din coada sunt: ");
+    for(int i=front; i<=rear; i++)
+        printf("%d ",queue[i]);
+    printf("\n");
+}
+
+int main(void)
+{
+    enqueue(10);
+    enqueue(20);
+    enqueue(30);
+    display();
+    printf("Elementul extras din coada: %d\n",dequeue());
+    display();
+    return 0;
+}
+ex3
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_SIZE 100
+
+typedef struct {
+    char text[101];
+    int line;
+} Edit;
+
+Edit stack[MAX_SIZE];
+int top = -1;
+
+void push(char *text, int line) {
+    if (top == MAX_SIZE - 1) {
+        printf("Limita de stocare atinsa\n");
+        return;
+    }
+    top++;
+    strncpy(stack[top].text, text, 100);
+    stack[top].line = line;
+}
+
+Edit pop() {
+    if (top == -1) {
+        printf("Nu exista modificari pentru undo\n");
+        return (Edit) {-1, -1}; 
+    }
+    return stack[top--];
+}
+
+int main() {
+    
+    push("Text adaugat", 1);
+    push("Alt text adaugat", 2);
+
+    Edit last_edit = pop();
+
+    if (last_edit.line != -1) {
+        printf("Undo la modificarea: %s de pe linia %d\n", last_edit.text, last_edit.line);
+    }
+
+    return 0;
+}
+
